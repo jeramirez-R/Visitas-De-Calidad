@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditoría en Punto de Venta</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .photo-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            background: #e2e8f0;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-submit:active {
+            background-color: var(--primary-hover);
+        }
+
+        .success-message {
+            display: none;
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Auditoría Punto de Venta</h1>
+        <p>Registro móvil de hallazgos</p>
+    </div>
+    
+    <form id="auditForm">
+        <div class="form-group">
+            <label for="storeName">Punto de Venta (ID / Nombre)</label>
+            <input type="text" id="storeName" placeholder="Ej. Tienda Norte - #102" required>
+        </div>
+
+        <div class="form-group">
+            <label for="auditorName">Auditor</label>
+            <input type="text" id="auditorName" placeholder="Nombre del auditor" required>
+        </div>
+
+        <div class="form-group">
+            <label for="auditDate">Fecha</label>
+            <input type="date" id="auditDate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Área Evaluada</label>
+            <select id="category" required>
+                <option value="">Selecciona área...</option>
+                <option value="Exhibición y POP">Exhibición y POP</option>
+                <option value="Limpieza y Orden">Limpieza y Orden</option>
+                <option value="Disponibilidad de Stock">Disponibilidad de Stock</option>
+                <option value="Precios y Etiquetado">Precios y Etiquetado</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Resultado</label>
+            <select id="status" required>
+                <option value="Conforme">✅ Conforme</option>
+                <option value="Observación">⚠️ Con Observaciones</option>
+                <option value="No Conforme">❌ No Conforme</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="comments">Comentarios / Detalle</label>
+            <textarea id="comments" placeholder="Escribe aquí las observaciones encontradas..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Evidencia Fotográfica</label>
+            <label for="photoInput" class="photo-btn">
+                📸 Tomar Foto / Adjuntar
+            </label>
+            <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display: none;">
+            <div class="photo-preview" id="photoPreview"></div>
+        </div>
+
+        <button type="submit" class="btn-submit">Guardar Registro</button>
+    </form>
+
+    <div class="success-message" id="successMessage">
+        ¡Auditoría guardada exitosamente!
+    </div>
+</div>
+
+<script>
+    document.getElementById('auditDate').valueAsDate = new Date();
+
+    const photoInput = document.getElementById('photoInput');
+    const photoPreview = document.getElementById('photoPreview');
+    const auditForm = document.getElementById('auditForm');
+    const successMessage = document.getElementById('successMessage');
+
+    photoInput.addEventListener('change', function(event) {
+        photoPreview.innerHTML = '';
+        const files = event.target.files;
+
+        if (files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    photoPreview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+
+    auditForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const auditData = {
+            id: Date.now(),
+            store: document.getElementById('storeName').value,
+            auditor: document.getElementById('auditorName').value,
+            date: document.getElementById('auditDate').value,
+            category: document.getElementById('category').value,
+            status: document.getElementById('status').value,
+            comments: document.getElementById('comments').value,
+            photosCount: photoInput.files.length
+        };
+
+        // Guardar localmente en el navegador del teléfono
+        let savedAudits = JSON.parse(localStorage.getItem('auditoria_pdv') || '[]');
+        savedAudits.push(auditData);
+        localStorage.setItem('auditoria_pdv', JSON.stringify(savedAudits));
+
+        successMessage.style.display = 'block';
+        auditForm.reset();
+        photoPreview.innerHTML = '';
+        document.getElementById('auditDate').valueAsDate = new Date();
+
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 3000);
+    });
+</script>
+
+</body>
+</html>
