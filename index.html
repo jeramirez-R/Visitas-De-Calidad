@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistema de Visitas PDV | El Corral</title>
+    
+    <!-- Librería para Recorte de Imágenes (Cropper.js) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <style>
         :root {
             --primary: #8B0000;          /* Rojo El Corral */
@@ -18,6 +23,7 @@
             --success: #15803d;
             --warning: #b45309;
             --danger: #b91c1c;
+            --info: #0284c7;
         }
 
         * {
@@ -143,7 +149,7 @@
             border-radius: 8px; font-weight: 700; color: var(--primary); cursor: pointer;
         }
 
-        /* GALERÍA DE FOTOS CON BOTÓN ELIMINAR */
+        /* GALERÍA DE FOTOS */
         .photo-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .photo-item { position: relative; width: 100%; height: 80px; }
         .photo-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
@@ -154,9 +160,16 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .toolbar { display: flex; gap: 8px; margin-bottom: 16px; }
-        .btn-export { flex: 1; background: var(--accent); color: var(--text); padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        /* BARRAS DE HERRAMIENTAS Y SINCRONIZACIÓN */
+        .toolbar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .toolbar-row { display: flex; gap: 8px; width: 100%; }
+
+        .btn-export { flex: 1; background: var(--accent); color: var(--text); padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.08); text-align: center; }
         .btn-export:hover { background: var(--accent-hover); }
+
+        .btn-sync-export { flex: 1; background: var(--info); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; }
+        .btn-sync-import { flex: 1; background: var(--success); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; display: inline-block; }
+
         .btn-clear { background: #ef4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: none; }
 
         .audit-item {
@@ -174,12 +187,23 @@
         .audit-photos { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
         .audit-photos img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
         
-        /* BOTONES DE ACCIÓN EXCLUSIVOS PARA EVALUADOR AUTORIZADO */
         .audit-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); justify-content: flex-end; }
         .btn-edit-item { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
         .btn-delete-item { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
 
         .editing-banner { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+
+        /* MODAL DE RECORTE DE IMAGEN */
+        .modal-crop {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85); z-index: 9999; flex-direction: column; justify-content: space-between; padding: 15px;
+        }
+        .crop-container { width: 100%; height: 70vh; background: #000; border-radius: 8px; overflow: hidden; }
+        .crop-toolbar { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .btn-crop-action { background: #333; color: white; border: 1px solid #555; padding: 8px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .crop-footer { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-crop-cancel { flex: 1; background: #4b5563; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-crop-save { flex: 1; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
         .view { display: none; }
         .view.active { display: block; }
@@ -204,16 +228,25 @@
 
     <div class="container">
 
-        <!-- VISTA REVISOR (PÚBLICA POR DEFECTO) -->
+        <!-- VISTA REVISOR -->
         <div id="reviewerView" class="view active">
             <div class="toolbar">
-                <button class="btn-export" onclick="exportToCSV()">📥 Descargar Excel (CSV)</button>
-                <button class="btn-clear" id="btnClearData" onclick="clearAllData()">🗑️ Borrar Todo</button>
+                <div class="toolbar-row">
+                    <button class="btn-export" onclick="exportToCSV()">📥 Excel (CSV)</button>
+                    <button class="btn-clear" id="btnClearData" onclick="clearAllData()">🗑️ Borrar Todo</button>
+                </div>
+                <div class="toolbar-row">
+                    <button class="btn-sync-export" onclick="exportarJSON()">📲 Compartir Respaldo (Móvil)</button>
+                    <label class="btn-sync-import">
+                        📂 Cargar Archivo (PC)
+                        <input type="file" id="importJsonInput" accept=".json" onchange="importarJSON(event)" style="display:none;">
+                    </label>
+                </div>
             </div>
             <div id="auditsList"></div>
         </div>
 
-        <!-- ACCESO RESPONSABLE DE LA VISITA -->
+        <!-- ACCESO RESPONSABLE -->
         <div id="authSection" class="view">
             <div id="loginView" class="auth-card">
                 <h2>Acceso Restringido</h2>
@@ -268,8 +301,8 @@
 
                     <div class="form-group">
                         <label>Evidencia Fotográfica</label>
-                        <label for="photoInput" class="photo-btn">📷 Agregar Fotos</label>
-                        <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display:none;">
+                        <label for="photoInput" class="photo-btn">📷 Agregar / Tomar Foto</label>
+                        <input type="file" id="photoInput" accept="image/*" style="display:none;">
                         <div class="photo-preview" id="photoPreview"></div>
                     </div>
 
@@ -280,21 +313,34 @@
 
     </div>
 
+    <!-- MODAL DE RECORTE Y EDICIÓN DE FOTOS -->
+    <div id="cropModal" class="modal-crop">
+        <div class="crop-container">
+            <img id="imageToCrop" src="" style="max-width: 100%; display: block;">
+        </div>
+        <div class="crop-toolbar">
+            <button type="button" class="btn-crop-action" onclick="rotateCrop(-90)">↺ Rotar Izq</button>
+            <button type="button" class="btn-crop-action" onclick="rotateCrop(90)">↻ Rotar Der</button>
+        </div>
+        <div class="crop-footer">
+            <button type="button" class="btn-crop-cancel" onclick="closeCropModal()">Cancelar</button>
+            <button type="button" class="btn-crop-save" onclick="applyCropAndSave()">Aceptar y Guardar</button>
+        </div>
+    </div>
+
     <script>
-        // CLAVE DE ALMACENAMIENTO RIGUROSO
         const STORAGE_KEY = 'visitas_corral_db_v2';
         const SESSION_KEY = 'visitas_corral_session_v2';
 
-        // BASE DE DATOS DE USUARIOS (ÚNICO USUARIO AUTORIZADO)
         const USUARIOS_AUTORIZADOS = {
             "jeramirez@alimentosalconsumidor.com": "Apostol23"
         };
 
         let currentAuditor = null;
         let currentPhotos = [];
+        let cropper = null;
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Restaurar sesión si existe
             const savedSession = localStorage.getItem(SESSION_KEY);
             if (savedSession) {
                 currentAuditor = savedSession;
@@ -306,14 +352,12 @@
             loadAuditsReviewer();
         });
 
-        // Sincronización automática entre pestañas/ventanas y contra refrescos
         window.addEventListener('storage', function(e) {
             if (e.key === STORAGE_KEY) {
                 loadAuditsReviewer();
             }
         });
 
-        // Alternar pestañas
         function switchRole(role) {
             document.getElementById('tabRevisor').classList.remove('active');
             document.getElementById('tabAuditor').classList.remove('active');
@@ -339,7 +383,6 @@
             }
         }
 
-        // Validación de ingreso
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('loginUser').value.trim().toLowerCase();
@@ -377,22 +420,74 @@
             switchRole('revisor');
         }
 
-        // Cargar imágenes acumulativamente sin borrar las anteriores
-        document.getElementById('photoInput').addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
+        // ==========================================
+        // MANEJO Y RECORTE DE IMÁGENES (CROPPER.JS)
+        // ==========================================
 
-            files.forEach(file => {
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    currentPhotos.push(event.target.result);
-                    renderPhotoPreview();
+                    openCropModal(event.target.result);
                 };
                 reader.readAsDataURL(file);
-            });
-            e.target.value = ''; // Limpiar input para permitir re-selección
+            }
+            e.target.value = '';
         });
 
-        // Renderizar vista previa de fotos con botón de eliminación
+        function openCropModal(imageSrc) {
+            const imageEl = document.getElementById('imageToCrop');
+            imageEl.src = imageSrc;
+            
+            document.getElementById('cropModal').style.display = 'flex';
+
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(imageEl, {
+                viewMode: 1,
+                autoCropArea: 0.9,
+                responsive: true,
+                restore: false
+            });
+        }
+
+        function rotateCrop(degree) {
+            if (cropper) {
+                cropper.rotate(degree);
+            }
+        }
+
+        function closeCropModal() {
+            document.getElementById('cropModal').style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        }
+
+        function applyCropAndSave() {
+            if (!cropper) return;
+
+            // Obtener el canvas recortado con dimensiones máximas de 1024px
+            const canvas = cropper.getCroppedCanvas({
+                maxWidth: 1024,
+                maxHeight: 1024,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+
+            // Convertir a JPEG comprimido para optimizar memoria
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            currentPhotos.push(compressedBase64);
+            renderPhotoPreview();
+            closeCropModal();
+        }
+
         function renderPhotoPreview() {
             const preview = document.getElementById('photoPreview');
             preview.innerHTML = '';
@@ -407,19 +502,17 @@
             });
         }
 
-        // Eliminar foto individual
         function removePhoto(index) {
             currentPhotos.splice(index, 1);
             renderPhotoPreview();
         }
 
-        // MOTOR IA DE VALORACIÓN (1 a 10) BASADO EN OBSERVACIONES
         function calcularScoreIA(texto) {
             const t = texto.toLowerCase();
 
             const graves = ["sucio", "roto", "dañado", "vencido", "moho", "plaga", "riesgo", "contaminado", "grave", "pésimo", "mal estado", "sin uniforme", "fuga"];
             const moderadas = ["falta", "incompleto", "desorden", "demora", "regular", "limpiar", "revisar", "atención", "desgaste", "observación"];
-            positivas = ["excelente", "limpio", "ordenado", "impecable", "cumple", "perfecto", "buen", "destacado", "rápido", "correcto", "organizado"];
+            const positivas = ["excelente", "limpio", "ordenado", "impecable", "cumple", "perfecto", "buen", "destacado", "rápido", "correcto", "organizado"];
 
             let penalty = 0;
             let bonus = 0;
@@ -451,7 +544,10 @@
             return { score, nivel, color };
         }
 
-        // Guardar o Actualizar Visita en LocalStorage (Persistencia Total)
+        // ==========================================
+        // GUARDADO DE LA VISITA
+        // ==========================================
+
         document.getElementById('auditForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -467,7 +563,6 @@
             let audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
             if (editingId) {
-                // ACTUALIZACIÓN DE VISITA EXISTENTE
                 audits = audits.map(audit => {
                     if (audit.id == editingId) {
                         return {
@@ -486,7 +581,6 @@
                     return audit;
                 });
             } else {
-                // NUEVA VISITA
                 const newAudit = {
                     id: Date.now(),
                     store: document.getElementById('storeName').value,
@@ -501,19 +595,25 @@
                 audits.unshift(newAudit);
             }
 
-            // GUARDADO RIGUROSO
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(audits));
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(audits));
 
-            cancelEditing();
+                cancelEditing();
 
-            const msg = document.getElementById('auditSuccess');
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
+                const msg = document.getElementById('auditSuccess');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 3000);
 
-            loadAuditsReviewer();
+                loadAuditsReviewer();
+            } catch (error) {
+                if (error.name === 'QuotaExceededError' || error.code === 22) {
+                    alert("⚠️ La memoria local está llena. Por favor descarga un respaldo JSON, cárgalo en la PC y elimina algunas visitas antiguas para continuar agregando nuevos registros.");
+                } else {
+                    alert("⚠️ Ocurrió un error al guardar la visita.");
+                }
+            }
         });
 
-        // Cargar datos de una visita en el formulario para modificarla
         function editAudit(id) {
             if (!currentAuditor) return;
 
@@ -537,7 +637,6 @@
             switchRole('auditor');
         }
 
-        // Cancelar edición
         function cancelEditing() {
             document.getElementById('editingAuditId').value = '';
             document.getElementById('auditForm').reset();
@@ -550,7 +649,6 @@
             document.getElementById('editingNotice').style.display = 'none';
         }
 
-        // Eliminar visita individual (Solo evaluador)
         function deleteAudit(id) {
             if (!currentAuditor) return;
 
@@ -562,12 +660,10 @@
             }
         }
 
-        // Renderizar el reporte de visitas registradas
         function loadAuditsReviewer() {
             const container = document.getElementById('auditsList');
             const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
-            // Mostrar u ocultar el botón general de borrar todo según rol de usuario
             if (currentAuditor) {
                 document.getElementById('btnClearData').style.display = 'block';
             } else {
@@ -587,7 +683,6 @@
                 const scoreDisplay = audit.score ? `${audit.score} / 10 (${audit.scoreLevel})` : 'Sin Calificar';
                 const colorBadge = audit.scoreColor || 'var(--primary)';
 
-                // Botones de edición/eliminación visible SOLO si el evaluador inició sesión
                 const actionsHTML = currentAuditor ? `
                     <div class="audit-actions">
                         <button type="button" class="btn-edit-item" onclick="editAudit(${audit.id})">✏️ Editar</button>
@@ -615,21 +710,95 @@
             win.document.write(`<img src="${src}" style="max-width:100%; height:auto;">`);
         }
 
+        // ==========================================
+        // EXPORTACIÓN E IMPORTACIÓN JSON / CSV
+        // ==========================================
+
+        function exportarJSON() {
+            const rawData = localStorage.getItem(STORAGE_KEY) || '[]';
+            const audits = JSON.parse(rawData);
+
+            if (audits.length === 0) {
+                return alert("No hay visitas registradas para compartir.");
+            }
+
+            const fecha = new Date().toISOString().slice(0, 10);
+            const nombreArchivo = `Visitas_Corral_${fecha}.json`;
+            const blob = new Blob([rawData], { type: 'application/json' });
+
+            if (navigator.share && navigator.canShare) {
+                const file = new File([blob], nombreArchivo, { type: 'application/json' });
+                if (navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        title: 'Respaldo de Visitas El Corral',
+                        text: 'Adjunto archivo JSON con la base de datos de visitas.',
+                        files: [file]
+                    }).catch(() => {
+                        descargarArchivoDirecto(blob, nombreArchivo);
+                    });
+                    return;
+                }
+            }
+
+            descargarArchivoDirecto(blob, nombreArchivo);
+        }
+
+        function descargarArchivoDirecto(blob, nombre) {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = nombre;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importarJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const nuevasVisitas = JSON.parse(e.target.result);
+
+                    if (!Array.isArray(nuevasVisitas)) {
+                        alert("El archivo seleccionado no tiene un formato válido.");
+                        return;
+                    }
+
+                    const visitasActuales = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                    const mapaVisitas = new Map();
+
+                    visitasActuales.forEach(v => mapaVisitas.set(v.id, v));
+                    nuevasVisitas.forEach(v => mapaVisitas.set(v.id, v));
+
+                    const listaSincronizada = Array.from(mapaVisitas.values());
+                    listaSincronizada.sort((a, b) => b.id - a.id);
+
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(listaSincronizada));
+                    
+                    alert(`✅ ¡Base de datos cargada con éxito! Total de registros: ${listaSincronizada.length}`);
+                    loadAuditsReviewer();
+
+                } catch (err) {
+                    alert("Error al procesar el archivo. Asegúrate de seleccionar el archivo JSON correcto.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
         function exportToCSV() {
             const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             if (audits.length === 0) return alert("No hay datos registrados para exportar.");
 
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFFID,Punto de Venta,Responsable Visita,Fecha,Puntuacion IA,Nivel,Observaciones,Fotos\n";
+            let csvContent = "\uFEFFID,Punto de Venta,Responsable Visita,Fecha,Puntuacion IA,Nivel,Observaciones,Fotos\n";
             audits.forEach(a => {
                 csvContent += `${a.id},"${a.store}","${a.auditor}",${a.date},${a.score || ''},"${a.scoreLevel || ''}","${a.comments.replace(/"/g, '""')}",${a.photos ? a.photos.length : 0}\n`;
             });
 
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", `Visitas_ElCorral_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            descargarArchivoDirecto(blob, `Visitas_ElCorral_${new Date().toISOString().slice(0,10)}.csv`);
         }
 
         function clearAllData() {
