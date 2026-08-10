@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Auditoría en Punto de Venta</title>
+    <title>Sistema de Visitas PDV | El Corral</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f1f5f9;
+            --primary: #8B0000;          /* Rojo El Corral */
+            --primary-hover: #6B0000;    /* Rojo Oscuro */
+            --accent: #FFC72C;           /* Amarillo/Dorado El Corral */
+            --accent-hover: #e5b020;
+            --bg: #F9F6F0;               /* Fondo crema suave */
             --card: #ffffff;
-            --text: #0f172a;
-            --border: #cbd5e1;
+            --text: #1c1917;             /* Carbón oscuro */
+            --text-muted: #78716c;
+            --border: #e7e5e4;
+            --success: #15803d;
+            --warning: #b45309;
+            --danger: #b91c1c;
         }
 
         * {
@@ -25,250 +31,442 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            padding: 12px;
-            display: flex;
-            justify-content: center;
+            padding-bottom: 40px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .header {
+        /* HEADER EL CORRAL */
+        .brand-banner {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
             text-align: center;
-            margin-bottom: 20px;
+            border-bottom: 4px solid var(--accent);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
-        .header h1 {
-            font-size: 1.3rem;
-            color: var(--primary);
+        .brand-banner h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .header p {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 4px;
+        .brand-banner span {
+            color: var(--accent);
         }
 
-        .form-group {
-            margin-bottom: 16px;
+        .app-header {
+            background: var(--card);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
         }
 
-        label {
-            display: block;
+        .user-info { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .user-info span { color: var(--primary); font-weight: 700; }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 0.9rem;
+            cursor: pointer;
+            display: none;
         }
 
-        input[type="text"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
+        .role-nav { 
+            display: flex; 
+            background: #e7e5e4; 
+            padding: 4px;
+            margin-bottom: 10px;
+        }
+
+        .role-btn {
+            flex: 1; padding: 12px; border: none; background: transparent;
+            font-weight: 700; font-size: 0.88rem; color: #57534e; cursor: pointer; border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .role-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container { width: 100%; max-width: 520px; margin: 15px auto; padding: 0 16px; }
+
+        .auth-card {
+            background: var(--card); padding: 26px 20px; border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            background-color: #fff;
+        }
+
+        .auth-card h2 { font-size: 1.3rem; margin-bottom: 6px; text-align: center; color: var(--primary); font-weight: 800; }
+        .auth-card p { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.85rem; color: var(--text); }
+
+        input, select, textarea {
+            width: 100%; padding: 12px; border: 1.5px solid var(--border);
+            border-radius: 8px; font-size: 0.95rem; background-color: #fff; outline: none;
+            transition: border-color 0.2s ease;
         }
 
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary);
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 90px;
+        textarea { resize: vertical; min-height: 85px; }
+
+        .btn-main {
+            width: 100%; background: var(--primary); color: white; padding: 14px;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 8px;
+            box-shadow: 0 3px 6px rgba(139, 0, 0, 0.2);
+            transition: background 0.2s;
         }
+
+        .btn-main:hover { background: var(--primary-hover); }
+
+        .alert { padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; display: none; text-align: center; font-weight: 600; }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
         .photo-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 14px;
-            background: #e2e8f0;
-            border: 2px dashed var(--border);
-            border-radius: 8px;
-            font-weight: 600;
-            color: #334155;
-            cursor: pointer;
-            text-align: center;
+            display: flex; align-items: center; justify-content: center;
+            padding: 12px; background: #fafaf9; border: 2px dashed var(--border);
+            border-radius: 8px; font-weight: 700; color: var(--primary); cursor: pointer;
         }
 
-        .photo-preview {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .photo-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .photo-preview img { width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
 
-        .photo-preview img {
-            width: 100%;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
+        .toolbar { display: flex; gap: 8px; margin-bottom: 16px; }
+        .btn-export { flex: 1; background: var(--accent); color: var(--text); padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+        .btn-export:hover { background: var(--accent-hover); }
+        .btn-clear { background: #ef4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
-        .btn-submit {
-            width: 100%;
-            background-color: var(--primary);
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
+        .audit-item {
+            background: var(--card); border-radius: 10px; padding: 16px; margin-bottom: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); border-left: 6px solid var(--border);
         }
+        .audit-item.Conforme { border-left-color: var(--success); }
+        .audit-item.Observación { border-left-color: var(--warning); }
+        .audit-item.No-Conforme { border-left-color: var(--danger); }
 
-        .btn-submit:active {
-            background-color: var(--primary-hover);
-        }
+        .audit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .audit-header strong { font-size: 1rem; color: var(--text); }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; color: white; text-transform: uppercase; }
+        .badge.Conforme { background: var(--success); }
+        .badge.Observación { background: var(--warning); }
+        .badge.No-Conforme { background: var(--danger); }
 
-        .success-message {
-            display: none;
-            background-color: #dcfce7;
-            color: #166534;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+        .audit-info { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px; }
+        .audit-comment { font-size: 0.88rem; background: #fafaf9; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #f5f5f4; color: #292524; }
+        .audit-photos { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
+        .audit-photos img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
+        
+        .view { display: none; }
+        .view.active { display: block; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>Auditoría Punto de Venta</h1>
-        <p>Registro móvil de hallazgos</p>
+    <!-- BRANDING EL CORRAL -->
+    <div class="brand-banner">
+        <h1>El Corral <span>| Visitas PDV</span></h1>
     </div>
-    
-    <form id="auditForm">
-        <div class="form-group">
-            <label for="storeName">Punto de Venta (ID / Nombre)</label>
-            <input type="text" id="storeName" placeholder="Ej. Tienda Norte - #102" required>
+
+    <header class="app-header">
+        <div class="user-info">📢 <span id="currentUserName">Consulta Pública</span></div>
+        <button id="btnLogout" class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </header>
+
+    <nav class="role-nav">
+        <button class="role-btn active" id="tabRevisor" onclick="switchRole('revisor')">📊 Reporte de Visitas</button>
+        <button class="role-btn" id="tabAuditor" onclick="switchRole('auditor')">📝 Registrar Visita</button>
+    </nav>
+
+    <div class="container">
+
+        <!-- VISTA REVISOR (PÚBLICA POR DEFECTO) -->
+        <div id="reviewerView" class="view active">
+            <div class="toolbar">
+                <button class="btn-export" onclick="exportToCSV()">📥 Descargar Excel (CSV)</button>
+                <button class="btn-clear" id="btnClearData" onclick="clearAllData()" style="display:none;">🗑️ Borrar Todo</button>
+            </div>
+            <div id="auditsList"></div>
         </div>
 
-        <div class="form-group">
-            <label for="auditorName">Auditor</label>
-            <input type="text" id="auditorName" placeholder="Nombre del auditor" required>
+        <!-- ACCESO RESPONSABLE DE LA VISITA -->
+        <div id="authSection" class="view">
+            <div id="loginView" class="auth-card">
+                <h2>Acceso Restringido</h2>
+                <p>Ingresa tus credenciales como Responsable de la Visita</p>
+
+                <div id="loginError" class="alert alert-danger"></div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUser">Correo Electrónico</label>
+                        <input type="email" id="loginUser" required placeholder="usuario@alimentosalconsumidor.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPass">Contraseña</label>
+                        <input type="password" id="loginPass" required placeholder="">
+                    </div>
+                    <button type="submit" class="btn-main">Ingresar como Responsable</button>
+                </form>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="auditDate">Fecha</label>
-            <input type="date" id="auditDate" required>
+        <!-- VISTA FORMULARIO DE VISITA -->
+        <div id="auditorFormView" class="view">
+            <div class="auth-card">
+                <h2 style="text-align: left; color: var(--primary);">Nueva Visita a Punto de Venta</h2>
+                <p style="text-align: left; margin-bottom: 15px;">Diligencia los datos del recorrido en el restaurante</p>
+
+                <div id="auditSuccess" class="alert alert-success">¡Visita registrada con éxito!</div>
+
+                <form id="auditForm">
+                    <div class="form-group">
+                        <label for="storeName">Restaurante / Punto de Venta (PDV)</label>
+                        <input type="text" id="storeName" placeholder="Ej. El Corral Calle 100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="auditDate">Fecha de la Visita</label>
+                        <input type="date" id="auditDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Área Evaluada</label>
+                        <select id="category" required>
+                            <option value="">Selecciona el área...</option>
+                            <option value="Cocina y Preparación">Cocina y Preparación</option>
+                            <option value="Servicio y Cajas">Servicio y Cajas</option>
+                            <option value="Limpieza y Desinfección">Limpieza y Desinfección</option>
+                            <option value="Calidad de Alimentos y Cadena de Frío">Calidad de Alimentos y Cadena de Frío</option>
+                            <option value="Exhibición y Material POP">Exhibición y Material POP</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Resultado de la Evaluación</label>
+                        <select id="status" required>
+                            <option value="Conforme">✅ Conforme</option>
+                            <option value="Observación">⚠️ Con Observaciones</option>
+                            <option value="No Conforme">❌ No Conforme</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comments">Observaciones / Hallazgos</label>
+                        <textarea id="comments" placeholder="Escribe los hallazgos detallados de la visita..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evidencia Fotográfica</label>
+                        <label for="photoInput" class="photo-btn">📷 Tomar / Adjuntar Fotos</label>
+                        <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display:none;">
+                        <div class="photo-preview" id="photoPreview"></div>
+                    </div>
+
+                    <button type="submit" class="btn-main">Guardar Registro de Visita</button>
+                </form>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="category">Área Evaluada</label>
-            <select id="category" required>
-                <option value="">Selecciona área...</option>
-                <option value="Exhibición y POP">Exhibición y POP</option>
-                <option value="Limpieza y Orden">Limpieza y Orden</option>
-                <option value="Disponibilidad de Stock">Disponibilidad de Stock</option>
-                <option value="Precios y Etiquetado">Precios y Etiquetado</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="status">Resultado</label>
-            <select id="status" required>
-                <option value="Conforme">✅ Conforme</option>
-                <option value="Observación">⚠️ Con Observaciones</option>
-                <option value="No Conforme">❌ No Conforme</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="comments">Comentarios / Detalle</label>
-            <textarea id="comments" placeholder="Escribe aquí las observaciones encontradas..." required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Evidencia Fotográfica</label>
-            <label for="photoInput" class="photo-btn">
-                📸 Tomar Foto / Adjuntar
-            </label>
-            <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display: none;">
-            <div class="photo-preview" id="photoPreview"></div>
-        </div>
-
-        <button type="submit" class="btn-submit">Guardar Registro</button>
-    </form>
-
-    <div class="success-message" id="successMessage">
-        ¡Auditoría guardada exitosamente!
     </div>
-</div>
 
-<script>
-    document.getElementById('auditDate').valueAsDate = new Date();
-
-    const photoInput = document.getElementById('photoInput');
-    const photoPreview = document.getElementById('photoPreview');
-    const auditForm = document.getElementById('auditForm');
-    const successMessage = document.getElementById('successMessage');
-
-    photoInput.addEventListener('change', function(event) {
-        photoPreview.innerHTML = '';
-        const files = event.target.files;
-
-        if (files) {
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    photoPreview.appendChild(img);
-                }
-                reader.readAsDataURL(file);
-            });
-        }
-    });
-
-    auditForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const auditData = {
-            id: Date.now(),
-            store: document.getElementById('storeName').value,
-            auditor: document.getElementById('auditorName').value,
-            date: document.getElementById('auditDate').value,
-            category: document.getElementById('category').value,
-            status: document.getElementById('status').value,
-            comments: document.getElementById('comments').value,
-            photosCount: photoInput.files.length
+    <script>
+        // BASE DE DATOS DE USUARIOS (TEXTO PLANO)
+        // Agrega o modifica usuarios según necesites
+        const USUARIOS_AUTORIZADOS = {
+            "jeramirez@alimentosalconsumidor.com": "Apostol23"
         };
 
-        // Guardar localmente en el navegador del teléfono
-        let savedAudits = JSON.parse(localStorage.getItem('auditoria_pdv') || '[]');
-        savedAudits.push(auditData);
-        localStorage.setItem('auditoria_pdv', JSON.stringify(savedAudits));
+        let currentAuditor = null;
+        let currentPhotos = [];
 
-        successMessage.style.display = 'block';
-        auditForm.reset();
-        photoPreview.innerHTML = '';
-        document.getElementById('auditDate').valueAsDate = new Date();
+        document.addEventListener("DOMContentLoaded", function() {
+            loadAuditsReviewer();
+        });
 
-        setTimeout(() => {
-            successMessage.style.display = 'none';
-        }, 3000);
-    });
-</script>
+        // Alternar pestañas
+        function switchRole(role) {
+            document.getElementById('tabRevisor').classList.remove('active');
+            document.getElementById('tabAuditor').classList.remove('active');
+            
+            document.getElementById('reviewerView').classList.remove('active');
+            document.getElementById('authSection').classList.remove('active');
+            document.getElementById('auditorFormView').classList.remove('active');
 
+            if (role === 'revisor') {
+                document.getElementById('tabRevisor').classList.add('active');
+                document.getElementById('reviewerView').classList.add('active');
+                loadAuditsReviewer();
+            } else if (role === 'auditor') {
+                document.getElementById('tabAuditor').classList.add('active');
+                if (currentAuditor) {
+                    document.getElementById('auditorFormView').classList.add('active');
+                    document.getElementById('auditDate').valueAsDate = new Date();
+                } else {
+                    document.getElementById('authSection').classList.add('active');
+                }
+            }
+        }
+
+        // Validación de ingreso
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginUser').value.trim().toLowerCase();
+            const pass = document.getElementById('loginPass').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            errorDiv.style.display = 'none';
+
+            if (USUARIOS_AUTORIZADOS.hasOwnProperty(email) && USUARIOS_AUTORIZADOS[email] === pass) {
+                currentAuditor = email;
+                document.getElementById('currentUserName').innerText = `Responsable: ${currentAuditor}`;
+                document.getElementById('btnLogout').style.display = 'block';
+                document.getElementById('btnClearData').style.display = 'block';
+
+                document.getElementById('authSection').classList.remove('active');
+                document.getElementById('auditorFormView').classList.add('active');
+                document.getElementById('auditDate').valueAsDate = new Date();
+            } else {
+                errorDiv.innerText = "Acceso denegado: Correo o contraseña incorrectos.";
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        function logout() {
+            currentAuditor = null;
+            document.getElementById('loginForm').reset();
+            document.getElementById('currentUserName').innerText = 'Consulta Pública';
+            document.getElementById('btnLogout').style.display = 'none';
+            document.getElementById('btnClearData').style.display = 'none';
+            switchRole('revisor');
+        }
+
+        // Cargar fotos adjuntas
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            currentPhotos = [];
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentPhotos.push(event.target.result);
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Guardar Visita en LocalStorage
+        document.getElementById('auditForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!currentAuditor) {
+                alert("Acceso denegado. Debes ingresar como Responsable de la Visita.");
+                return;
+            }
+
+            const newAudit = {
+                id: Date.now(),
+                store: document.getElementById('storeName').value,
+                auditor: currentAuditor,
+                date: document.getElementById('auditDate').value,
+                category: document.getElementById('category').value,
+                status: document.getElementById('status').value,
+                comments: document.getElementById('comments').value,
+                photos: currentPhotos
+            };
+
+            let audits = JSON.parse(localStorage.getItem('visitas_corral_db') || '[]');
+            audits.unshift(newAudit);
+            localStorage.setItem('visitas_corral_db', JSON.stringify(audits));
+
+            document.getElementById('auditForm').reset();
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('auditDate').valueAsDate = new Date();
+            currentPhotos = [];
+
+            const msg = document.getElementById('auditSuccess');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        });
+
+        // Renderizar el reporte de visitas registrados
+        function loadAuditsReviewer() {
+            const container = document.getElementById('auditsList');
+            const audits = JSON.parse(localStorage.getItem('visitas_corral_db') || '[]');
+
+            if (audits.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:#a8a29e;">No hay registros de visitas en este momento.</div>`;
+                return;
+            }
+
+            container.innerHTML = audits.map(audit => {
+                const statusClass = audit.status.replace(/\s+/g, '-');
+                const photosHTML = audit.photos && audit.photos.length > 0 
+                    ? `<div class="audit-photos">${audit.photos.map(p => `<img src="${p}" onclick="openImage('${p}')">`).join('')}</div>` 
+                    : '';
+
+                return `
+                    <div class="audit-item ${statusClass}">
+                        <div class="audit-header">
+                            <strong>${audit.store}</strong>
+                            <span class="badge ${statusClass}">${audit.status}</span>
+                        </div>
+                        <div class="audit-info">👤 Responsable: <b>${audit.auditor}</b> | 📅 ${audit.date}</div>
+                        <div class="audit-info">📂 Área: <b>${audit.category}</b></div>
+                        <div class="audit-comment">💬 "${audit.comments}"</div>
+                        ${photosHTML}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openImage(src) {
+            const win = window.open();
+            win.document.write(`<img src="${src}" style="max-width:100%; height:auto;">`);
+        }
+
+        function exportToCSV() {
+            const audits = JSON.parse(localStorage.getItem('visitas_corral_db') || '[]');
+            if (audits.length === 0) return alert("No hay datos registrados para exportar.");
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFID,Punto de Venta,Responsable Visita,Fecha,Area Evaluada,Resultado,Observaciones,Fotos\n";
+            audits.forEach(a => {
+                csvContent += `${a.id},"${a.store}","${a.auditor}",${a.date},"${a.category}","${a.status}","${a.comments.replace(/"/g, '""')}",${a.photos ? a.photos.length : 0}\n`;
+            });
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `Visitas_ElCorral_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function clearAllData() {
+            if (confirm("¿Estás seguro de borrar todos los registros de visitas almacenados?")) {
+                localStorage.removeItem('visitas_corral_db');
+                loadAuditsReviewer();
+            }
+        }
+    </script>
 </body>
 </html>
