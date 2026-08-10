@@ -143,34 +143,44 @@
             border-radius: 8px; font-weight: 700; color: var(--primary); cursor: pointer;
         }
 
-        .photo-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-        .photo-preview img { width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+        /* GALERÍA DE FOTOS CON BOTÓN ELIMINAR */
+        .photo-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .photo-item { position: relative; width: 100%; height: 80px; }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+        .btn-remove-photo {
+            position: absolute; top: -6px; right: -6px; background: #ef4444; color: white;
+            border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+            font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
 
         .toolbar { display: flex; gap: 8px; margin-bottom: 16px; }
         .btn-export { flex: 1; background: var(--accent); color: var(--text); padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
         .btn-export:hover { background: var(--accent-hover); }
-        .btn-clear { background: #ef4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-clear { background: #ef4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: none; }
 
         .audit-item {
             background: var(--card); border-radius: 10px; padding: 16px; margin-bottom: 14px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); border-left: 6px solid var(--border);
+            position: relative;
         }
-        .audit-item.Conforme { border-left-color: var(--success); }
-        .audit-item.Observación { border-left-color: var(--warning); }
-        .audit-item.No-Conforme { border-left-color: var(--danger); }
-
-        .audit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        
+        .audit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-right: 5px; }
         .audit-header strong { font-size: 1rem; color: var(--text); }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 800; color: white; text-transform: uppercase; }
-        .badge.Conforme { background: var(--success); }
-        .badge.Observación { background: var(--warning); }
-        .badge.No-Conforme { background: var(--danger); }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 800; color: white; }
 
         .audit-info { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px; }
         .audit-comment { font-size: 0.88rem; background: #fafaf9; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #f5f5f4; color: #292524; }
         .audit-photos { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
         .audit-photos img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
         
+        /* BOTONES DE ACCIÓN EXCLUSIVOS PARA EVALUADOR AUTORIZADO */
+        .audit-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); justify-content: flex-end; }
+        .btn-edit-item { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+        .btn-delete-item { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+
+        .editing-banner { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+
         .view { display: none; }
         .view.active { display: block; }
     </style>
@@ -189,7 +199,7 @@
 
     <nav class="role-nav">
         <button class="role-btn active" id="tabRevisor" onclick="switchRole('revisor')">📊 Reporte de Visitas</button>
-        <button class="role-btn" id="tabAuditor" onclick="switchRole('auditor')">📝 Registrar Visita</button>
+        <button class="role-btn" id="tabAuditor" onclick="switchRole('auditor')">📝 Registrar / Editar Visita</button>
     </nav>
 
     <div class="container">
@@ -198,7 +208,7 @@
         <div id="reviewerView" class="view active">
             <div class="toolbar">
                 <button class="btn-export" onclick="exportToCSV()">📥 Descargar Excel (CSV)</button>
-                <button class="btn-clear" id="btnClearData" onclick="clearAllData()" style="display:none;">🗑️ Borrar Todo</button>
+                <button class="btn-clear" id="btnClearData" onclick="clearAllData()">🗑️ Borrar Todo</button>
             </div>
             <div id="auditsList"></div>
         </div>
@@ -214,11 +224,11 @@
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="loginUser">Correo Electrónico</label>
-                        <input type="email" id="loginUser" required placeholder="usuario@alimentosalconsumidor.com">
+                        <input type="email" id="loginUser" required placeholder="Usuario@alimentosalconsumidor.com">
                     </div>
                     <div class="form-group">
                         <label for="loginPass">Contraseña</label>
-                        <input type="password" id="loginPass" required placeholder="">
+                        <input type="password" id="loginPass" required placeholder="••••••••">
                     </div>
                     <button type="submit" class="btn-main">Ingresar como Responsable</button>
                 </form>
@@ -228,12 +238,19 @@
         <!-- VISTA FORMULARIO DE VISITA -->
         <div id="auditorFormView" class="view">
             <div class="auth-card">
-                <h2 style="text-align: left; color: var(--primary);">Nueva Visita a Punto de Venta</h2>
+                <div id="editingNotice" class="editing-banner" style="display:none;">
+                    <span>✏️ Editando registro de visita existente</span>
+                    <button type="button" onclick="cancelEditing()" style="background:none; border:none; color:#92400e; font-weight:bold; cursor:pointer;">Cancelar</button>
+                </div>
+
+                <h2 id="formTitle" style="text-align: left; color: var(--primary);">Nueva Visita a Punto de Venta</h2>
                 <p style="text-align: left; margin-bottom: 15px;">Diligencia los datos del recorrido en el restaurante</p>
 
-                <div id="auditSuccess" class="alert alert-success">¡Visita registrada con éxito!</div>
+                <div id="auditSuccess" class="alert alert-success">¡Visita guardada con éxito!</div>
 
                 <form id="auditForm">
+                    <input type="hidden" id="editingAuditId" value="">
+
                     <div class="form-group">
                         <label for="storeName">Restaurante / Punto de Venta (PDV)</label>
                         <input type="text" id="storeName" placeholder="Ej. El Corral Calle 100" required>
@@ -245,39 +262,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="category">Área Evaluada</label>
-                        <select id="category" required>
-                            <option value="">Selecciona el área...</option>
-                            <option value="Cocina y Preparación">Cocina y Preparación</option>
-                            <option value="Servicio y Cajas">Servicio y Cajas</option>
-                            <option value="Limpieza y Desinfección">Limpieza y Desinfección</option>
-                            <option value="Calidad de Alimentos y Cadena de Frío">Calidad de Alimentos y Cadena de Frío</option>
-                            <option value="Exhibición y Material POP">Exhibición y Material POP</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="status">Resultado de la Evaluación</label>
-                        <select id="status" required>
-                            <option value="Conforme">✅ Conforme</option>
-                            <option value="Observación">⚠️ Con Observaciones</option>
-                            <option value="No Conforme">❌ No Conforme</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label for="comments">Observaciones / Hallazgos</label>
                         <textarea id="comments" placeholder="Escribe los hallazgos detallados de la visita..." required></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Evidencia Fotográfica</label>
-                        <label for="photoInput" class="photo-btn">📷 Tomar / Adjuntar Fotos</label>
+                        <label for="photoInput" class="photo-btn">📷 Agregar Fotos</label>
                         <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display:none;">
                         <div class="photo-preview" id="photoPreview"></div>
                     </div>
 
-                    <button type="submit" class="btn-main">Guardar Registro de Visita</button>
+                    <button type="submit" id="btnSubmitForm" class="btn-main">Guardar Registro de Visita</button>
                 </form>
             </div>
         </div>
@@ -285,8 +281,11 @@
     </div>
 
     <script>
-        // BASE DE DATOS DE USUARIOS (TEXTO PLANO)
-        // Agrega o modifica usuarios según necesites
+        // CLAVE DE ALMACENAMIENTO RIGUROSO
+        const STORAGE_KEY = 'visitas_corral_db_v2';
+        const SESSION_KEY = 'visitas_corral_session_v2';
+
+        // BASE DE DATOS DE USUARIOS (ÚNICO USUARIO AUTORIZADO)
         const USUARIOS_AUTORIZADOS = {
             "jeramirez@alimentosalconsumidor.com": "Apostol23"
         };
@@ -295,7 +294,23 @@
         let currentPhotos = [];
 
         document.addEventListener("DOMContentLoaded", function() {
+            // Restaurar sesión si existe
+            const savedSession = localStorage.getItem(SESSION_KEY);
+            if (savedSession) {
+                currentAuditor = savedSession;
+                document.getElementById('currentUserName').innerText = `Responsable: ${currentAuditor}`;
+                document.getElementById('btnLogout').style.display = 'block';
+                document.getElementById('btnClearData').style.display = 'block';
+            }
+
             loadAuditsReviewer();
+        });
+
+        // Sincronización automática entre pestañas/ventanas y contra refrescos
+        window.addEventListener('storage', function(e) {
+            if (e.key === STORAGE_KEY) {
+                loadAuditsReviewer();
+            }
         });
 
         // Alternar pestañas
@@ -315,7 +330,9 @@
                 document.getElementById('tabAuditor').classList.add('active');
                 if (currentAuditor) {
                     document.getElementById('auditorFormView').classList.add('active');
-                    document.getElementById('auditDate').valueAsDate = new Date();
+                    if (!document.getElementById('editingAuditId').value) {
+                        document.getElementById('auditDate').valueAsDate = new Date();
+                    }
                 } else {
                     document.getElementById('authSection').classList.add('active');
                 }
@@ -333,6 +350,8 @@
 
             if (USUARIOS_AUTORIZADOS.hasOwnProperty(email) && USUARIOS_AUTORIZADOS[email] === pass) {
                 currentAuditor = email;
+                localStorage.setItem(SESSION_KEY, currentAuditor);
+
                 document.getElementById('currentUserName').innerText = `Responsable: ${currentAuditor}`;
                 document.getElementById('btnLogout').style.display = 'block';
                 document.getElementById('btnClearData').style.display = 'block';
@@ -340,6 +359,7 @@
                 document.getElementById('authSection').classList.remove('active');
                 document.getElementById('auditorFormView').classList.add('active');
                 document.getElementById('auditDate').valueAsDate = new Date();
+                loadAuditsReviewer();
             } else {
                 errorDiv.innerText = "Acceso denegado: Correo o contraseña incorrectos.";
                 errorDiv.style.display = 'block';
@@ -348,6 +368,8 @@
 
         function logout() {
             currentAuditor = null;
+            localStorage.removeItem(SESSION_KEY);
+            cancelEditing();
             document.getElementById('loginForm').reset();
             document.getElementById('currentUserName').innerText = 'Consulta Pública';
             document.getElementById('btnLogout').style.display = 'none';
@@ -355,26 +377,81 @@
             switchRole('revisor');
         }
 
-        // Cargar fotos adjuntas
+        // Cargar imágenes acumulativamente sin borrar las anteriores
         document.getElementById('photoInput').addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
-            const preview = document.getElementById('photoPreview');
-            preview.innerHTML = '';
-            currentPhotos = [];
 
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     currentPhotos.push(event.target.result);
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    preview.appendChild(img);
+                    renderPhotoPreview();
                 };
                 reader.readAsDataURL(file);
             });
+            e.target.value = ''; // Limpiar input para permitir re-selección
         });
 
-        // Guardar Visita en LocalStorage
+        // Renderizar vista previa de fotos con botón de eliminación
+        function renderPhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            currentPhotos.forEach((photo, index) => {
+                const item = document.createElement('div');
+                item.className = 'photo-item';
+                item.innerHTML = `
+                    <img src="${photo}">
+                    <button type="button" class="btn-remove-photo" onclick="removePhoto(${index})">✕</button>
+                `;
+                preview.appendChild(item);
+            });
+        }
+
+        // Eliminar foto individual
+        function removePhoto(index) {
+            currentPhotos.splice(index, 1);
+            renderPhotoPreview();
+        }
+
+        // MOTOR IA DE VALORACIÓN (1 a 10) BASADO EN OBSERVACIONES
+        function calcularScoreIA(texto) {
+            const t = texto.toLowerCase();
+
+            const graves = ["sucio", "roto", "dañado", "vencido", "moho", "plaga", "riesgo", "contaminado", "grave", "pésimo", "mal estado", "sin uniforme", "fuga"];
+            const moderadas = ["falta", "incompleto", "desorden", "demora", "regular", "limpiar", "revisar", "atención", "desgaste", "observación"];
+            positivas = ["excelente", "limpio", "ordenado", "impecable", "cumple", "perfecto", "buen", "destacado", "rápido", "correcto", "organizado"];
+
+            let penalty = 0;
+            let bonus = 0;
+
+            graves.forEach(word => { if (t.includes(word)) penalty += 2.5; });
+            moderadas.forEach(word => { if (t.includes(word)) penalty += 1.2; });
+            positivas.forEach(word => { if (t.includes(word)) bonus += 1.0; });
+
+            let score = 10 - penalty + bonus;
+            score = Math.min(10, Math.max(1, Math.round(score * 10) / 10));
+
+            let nivel = "Excelente";
+            let color = "var(--success)";
+
+            if (score < 4) {
+                nivel = "Crítico";
+                color = "var(--danger)";
+            } else if (score < 6) {
+                nivel = "Deficiente";
+                color = "var(--danger)";
+            } else if (score < 8) {
+                nivel = "Regular";
+                color = "var(--warning)";
+            } else if (score < 9.5) {
+                nivel = "Bueno";
+                color = "#15803d";
+            }
+
+            return { score, nivel, color };
+        }
+
+        // Guardar o Actualizar Visita en LocalStorage (Persistencia Total)
         document.getElementById('auditForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -383,35 +460,119 @@
                 return;
             }
 
-            const newAudit = {
-                id: Date.now(),
-                store: document.getElementById('storeName').value,
-                auditor: currentAuditor,
-                date: document.getElementById('auditDate').value,
-                category: document.getElementById('category').value,
-                status: document.getElementById('status').value,
-                comments: document.getElementById('comments').value,
-                photos: currentPhotos
-            };
+            const commentsText = document.getElementById('comments').value;
+            const iaResult = calcularScoreIA(commentsText);
+            const editingId = document.getElementById('editingAuditId').value;
 
-            let audits = JSON.parse(localStorage.getItem('visitas_corral_db') || '[]');
-            audits.unshift(newAudit);
-            localStorage.setItem('visitas_corral_db', JSON.stringify(audits));
+            let audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
+            if (editingId) {
+                // ACTUALIZACIÓN DE VISITA EXISTENTE
+                audits = audits.map(audit => {
+                    if (audit.id == editingId) {
+                        return {
+                            ...audit,
+                            store: document.getElementById('storeName').value,
+                            date: document.getElementById('auditDate').value,
+                            score: iaResult.score,
+                            scoreLevel: iaResult.nivel,
+                            scoreColor: iaResult.color,
+                            comments: commentsText,
+                            photos: [...currentPhotos],
+                            lastEditedBy: currentAuditor,
+                            lastEditedAt: new Date().toISOString()
+                        };
+                    }
+                    return audit;
+                });
+            } else {
+                // NUEVA VISITA
+                const newAudit = {
+                    id: Date.now(),
+                    store: document.getElementById('storeName').value,
+                    auditor: currentAuditor,
+                    date: document.getElementById('auditDate').value,
+                    score: iaResult.score,
+                    scoreLevel: iaResult.nivel,
+                    scoreColor: iaResult.color,
+                    comments: commentsText,
+                    photos: [...currentPhotos]
+                };
+                audits.unshift(newAudit);
+            }
+
+            // GUARDADO RIGUROSO
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(audits));
+
+            cancelEditing();
+
+            const msg = document.getElementById('auditSuccess');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+
+            loadAuditsReviewer();
+        });
+
+        // Cargar datos de una visita en el formulario para modificarla
+        function editAudit(id) {
+            if (!currentAuditor) return;
+
+            const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const audit = audits.find(a => a.id == id);
+
+            if (!audit) return;
+
+            document.getElementById('editingAuditId').value = audit.id;
+            document.getElementById('storeName').value = audit.store;
+            document.getElementById('auditDate').value = audit.date;
+            document.getElementById('comments').value = audit.comments;
+            
+            currentPhotos = audit.photos ? [...audit.photos] : [];
+            renderPhotoPreview();
+
+            document.getElementById('formTitle').innerText = "Modificar Visita Registrada";
+            document.getElementById('btnSubmitForm').innerText = "Actualizar Visita";
+            document.getElementById('editingNotice').style.display = 'flex';
+
+            switchRole('auditor');
+        }
+
+        // Cancelar edición
+        function cancelEditing() {
+            document.getElementById('editingAuditId').value = '';
             document.getElementById('auditForm').reset();
             document.getElementById('photoPreview').innerHTML = '';
             document.getElementById('auditDate').valueAsDate = new Date();
             currentPhotos = [];
 
-            const msg = document.getElementById('auditSuccess');
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
-        });
+            document.getElementById('formTitle').innerText = "Nueva Visita a Punto de Venta";
+            document.getElementById('btnSubmitForm').innerText = "Guardar Registro de Visita";
+            document.getElementById('editingNotice').style.display = 'none';
+        }
 
-        // Renderizar el reporte de visitas registrados
+        // Eliminar visita individual (Solo evaluador)
+        function deleteAudit(id) {
+            if (!currentAuditor) return;
+
+            if (confirm("¿Estás seguro de que deseas eliminar este registro de visita permanentemente?")) {
+                let audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                audits = audits.filter(a => a.id != id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(audits));
+                loadAuditsReviewer();
+            }
+        }
+
+        // Renderizar el reporte de visitas registradas
         function loadAuditsReviewer() {
             const container = document.getElementById('auditsList');
-            const audits = JSON.parse(localStorage.getItem('visitas_corral_db') || '[]');
+            const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+            // Mostrar u ocultar el botón general de borrar todo según rol de usuario
+            if (currentAuditor) {
+                document.getElementById('btnClearData').style.display = 'block';
+            } else {
+                document.getElementById('btnClearData').style.display = 'none';
+            }
 
             if (audits.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding:30px; color:#a8a29e;">No hay registros de visitas en este momento.</div>`;
@@ -419,21 +580,31 @@
             }
 
             container.innerHTML = audits.map(audit => {
-                const statusClass = audit.status.replace(/\s+/g, '-');
                 const photosHTML = audit.photos && audit.photos.length > 0 
                     ? `<div class="audit-photos">${audit.photos.map(p => `<img src="${p}" onclick="openImage('${p}')">`).join('')}</div>` 
                     : '';
 
+                const scoreDisplay = audit.score ? `${audit.score} / 10 (${audit.scoreLevel})` : 'Sin Calificar';
+                const colorBadge = audit.scoreColor || 'var(--primary)';
+
+                // Botones de edición/eliminación visible SOLO si el evaluador inició sesión
+                const actionsHTML = currentAuditor ? `
+                    <div class="audit-actions">
+                        <button type="button" class="btn-edit-item" onclick="editAudit(${audit.id})">✏️ Editar</button>
+                        <button type="button" class="btn-delete-item" onclick="deleteAudit(${audit.id})">🗑️ Eliminar</button>
+                    </div>
+                ` : '';
+
                 return `
-                    <div class="audit-item ${statusClass}">
+                    <div class="audit-item" style="border-left-color: ${colorBadge};">
                         <div class="audit-header">
                             <strong>${audit.store}</strong>
-                            <span class="badge ${statusClass}">${audit.status}</span>
+                            <span class="badge" style="background-color: ${colorBadge};">🤖 IA: ${scoreDisplay}</span>
                         </div>
                         <div class="audit-info">👤 Responsable: <b>${audit.auditor}</b> | 📅 ${audit.date}</div>
-                        <div class="audit-info">📂 Área: <b>${audit.category}</b></div>
                         <div class="audit-comment">💬 "${audit.comments}"</div>
                         ${photosHTML}
+                        ${actionsHTML}
                     </div>
                 `;
             }).join('');
@@ -445,12 +616,12 @@
         }
 
         function exportToCSV() {
-            const audits = JSON.parse(localStorage.getItem('visitas_corral_db') || '[]');
+            const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             if (audits.length === 0) return alert("No hay datos registrados para exportar.");
 
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFFID,Punto de Venta,Responsable Visita,Fecha,Area Evaluada,Resultado,Observaciones,Fotos\n";
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFFID,Punto de Venta,Responsable Visita,Fecha,Puntuacion IA,Nivel,Observaciones,Fotos\n";
             audits.forEach(a => {
-                csvContent += `${a.id},"${a.store}","${a.auditor}",${a.date},"${a.category}","${a.status}","${a.comments.replace(/"/g, '""')}",${a.photos ? a.photos.length : 0}\n`;
+                csvContent += `${a.id},"${a.store}","${a.auditor}",${a.date},${a.score || ''},"${a.scoreLevel || ''}","${a.comments.replace(/"/g, '""')}",${a.photos ? a.photos.length : 0}\n`;
             });
 
             const link = document.createElement("a");
@@ -462,8 +633,9 @@
         }
 
         function clearAllData() {
-            if (confirm("¿Estás seguro de borrar todos los registros de visitas almacenados?")) {
-                localStorage.removeItem('visitas_corral_db');
+            if (!currentAuditor) return;
+            if (confirm("¿Estás seguro de borrar TODOS los registros de visitas almacenados? Esta acción no se puede deshacer.")) {
+                localStorage.removeItem(STORAGE_KEY);
                 loadAuditsReviewer();
             }
         }
