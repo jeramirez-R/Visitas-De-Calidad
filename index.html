@@ -37,7 +37,10 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            padding-bottom: 40px;
+            padding-bottom: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* HEADER EL CORRAL */
@@ -104,7 +107,13 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .container { width: 100%; max-width: 520px; margin: 15px auto; padding: 0 16px; }
+        .container { 
+            width: 100%; 
+            max-width: 520px; 
+            margin: 15px auto; 
+            padding: 0 16px;
+            flex: 1;
+        }
 
         .auth-card {
             background: var(--card); padding: 26px 20px; border-radius: 12px;
@@ -128,7 +137,31 @@
             border-color: var(--primary);
         }
 
-        textarea { resize: vertical; min-height: 85px; }
+        textarea { resize: vertical; min-height: 95px; }
+
+        /* BARRA DE FORMATO DE TEXTO */
+        .text-format-toolbar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .btn-format {
+            background: #f5f5f4;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .btn-format:hover {
+            background: #e7e5e4;
+            border-color: #d6d3d1;
+        }
 
         .btn-main {
             width: 100%; background: var(--primary); color: white; padding: 14px;
@@ -180,7 +213,43 @@
         .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 800; color: white; }
 
         .audit-info { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px; }
-        .audit-comment { font-size: 0.88rem; background: #fafaf9; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #f5f5f4; color: #292524; }
+        
+        /* ESTILO VERTICAL PARA LOS COMENTARIOS */
+        .audit-comment { 
+            font-size: 0.88rem; 
+            background: #fafaf9; 
+            padding: 12px; 
+            border-radius: 6px; 
+            margin-top: 8px; 
+            border: 1px solid #f5f5f4; 
+            color: #292524; 
+        }
+
+        .audit-comment-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .audit-comment-list li {
+            position: relative;
+            padding-left: 20px;
+            line-height: 1.4;
+        }
+
+        .audit-comment-list li::before {
+            content: "•";
+            position: absolute;
+            left: 5px;
+            top: 0;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
         .audit-photos { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
         .audit-photos img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
         
@@ -224,6 +293,19 @@
         .crop-footer { display: flex; gap: 10px; margin-top: 10px; }
         .btn-crop-cancel { flex: 1; background: #4b5563; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-crop-save { flex: 1; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+        /* FOOTER AL FINAL DE LA PÁGINA */
+        .app-footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-top: 1px solid var(--border);
+            background: var(--card);
+            letter-spacing: 0.5px;
+        }
 
         .view { display: none; }
         .view.active { display: block; }
@@ -315,7 +397,14 @@
 
                     <div class="form-group">
                         <label for="comments">Observaciones / Hallazgos</label>
-                        <textarea id="comments" placeholder="Escribe los hallazgos detallados de la visita..." required></textarea>
+                        
+                        <!-- BARRA DE HERRAMIENTAS DE FORMATO -->
+                        <div class="text-format-toolbar">
+                            <button type="button" class="btn-format" onclick="applyTextFormat('bold')" title="Negrilla"><b>B</b> Negrilla</button>
+                            <button type="button" class="btn-format" onclick="applyTextFormat('underline')" title="Subrayado"><u>U</u> Subrayar</button>
+                        </div>
+
+                        <textarea id="comments" placeholder="Escribe los hallazgos detallados de la visita. Selecciona texto y presiona los botones arriba para formatear..." required></textarea>
                     </div>
 
                     <!-- CONTROL PARA DESACTIVAR NOTA DE IA Y ASIGNARLA MANUALMENTE -->
@@ -343,6 +432,11 @@
         </div>
 
     </div>
+
+    <!-- PIE DE PÁGINA SOLICITADO -->
+    <footer class="app-footer">
+        Comprometidos con la excelencia
+    </footer>
 
     <!-- MODAL DE RECORTE Y EDICIÓN DE FOTOS -->
     <div id="cropModal" class="modal-crop">
@@ -457,6 +551,56 @@
             group.style.display = chk.checked ? 'block' : 'none';
         }
 
+        // APLICAR FORMATO DE NE GRILLA Y SUBRAYADO EN EL TEXTAREA
+        function applyTextFormat(type) {
+            const textarea = document.getElementById('comments');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+
+            if (start === end) {
+                alert("Por favor selecciona primero el texto que deseas formatear.");
+                return;
+            }
+
+            const selectedText = textarea.value.substring(start, end);
+            let formattedText = selectedText;
+
+            if (type === 'bold') {
+                formattedText = `**${selectedText}**`;
+            } else if (type === 'underline') {
+                formattedText = `<u>${selectedText}</u>`;
+            }
+
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start, start + formattedText.length);
+        }
+
+        // FUNCIÓN PARA FORMATEAR EL TEXTO VERTICALMENTE EN CADA PUNTO Y APARTE + PARSEO DE ETIQUETAS
+        function formatCommentsVertical(text) {
+            if (!text) return '';
+            
+            // Separa el texto por saltos de línea o por punto seguido
+            const lines = text.split(/(?:\r\n|\r|\n|\.\s+)/).map(l => l.trim()).filter(l => l.length > 0);
+            
+            const parseTags = (str) => {
+                // Convierte **texto** a <b>texto</b>
+                let parsed = str.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                return parsed;
+            };
+
+            if (lines.length <= 1) {
+                return `💬 "${parseTags(text)}"`;
+            }
+
+            const items = lines.map(line => {
+                const cleanLine = line.endsWith('.') ? line.slice(0, -1) : line;
+                return `<li>${parseTags(cleanLine)}.</li>`;
+            }).join('');
+
+            return `<ul class="audit-comment-list">${items}</ul>`;
+        }
+
         // ==========================================
         // MANEJO Y RECORTE DE IMÁGENES (CROPPER.JS)
         // ==========================================
@@ -544,7 +688,8 @@
 
         // ALGORITMO MEJORADO DE EVALUACIÓN DE TEXTO DE IA
         function calcularScoreIA(texto) {
-            const t = texto.toLowerCase();
+            // Limpiar etiquetas de formato antes de procesar
+            const t = texto.replace(/\*\*/g, '').replace(/<\/?u>/g, '').toLowerCase();
 
             const graves = [
                 "sucio", "roto", "dañado", "vencido", "moho", "plaga", "riesgo", "contaminado", 
@@ -569,7 +714,6 @@
 
             let score = 10 - penalty + bonus;
             
-            // Si hay penalizaciones pero no se sumaron puntos de bonus, asegurar descuento proporcional
             if (penalty > 0 && score >= 10) {
                 score = 10 - penalty;
             }
@@ -764,6 +908,8 @@
                 const scoreDisplay = audit.score !== undefined ? `${audit.score} / 10 (${audit.scoreLevel})` : 'Sin Calificar';
                 const colorBadge = audit.scoreColor || 'var(--primary)';
                 const badgeTag = audit.isManualScore ? '✏️ Manual:' : '🤖 IA:';
+                
+                const formattedComments = formatCommentsVertical(audit.comments);
 
                 const actionsHTML = currentAuditor ? `
                     <div class="audit-actions">
@@ -779,7 +925,7 @@
                             <span class="badge" style="background-color: ${colorBadge};">${badgeTag} ${scoreDisplay}</span>
                         </div>
                         <div class="audit-info">👤 Responsable: <b>${audit.auditor}</b> | 📅 ${audit.date}</div>
-                        <div class="audit-comment">💬 "${audit.comments}"</div>
+                        <div class="audit-comment">${formattedComments}</div>
                         ${photosHTML}
                         ${actionsHTML}
                     </div>
