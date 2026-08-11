@@ -224,6 +224,23 @@
 
         .audit-info { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500; }
         
+        .map-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 6px;
+            padding: 5px 10px;
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.82rem;
+            transition: background 0.2s;
+        }
+        .map-link-btn:hover { background-color: #dcfce7; }
+
         .audit-comment { 
             font-size: 0.95rem; 
             background: #fcfbf9; 
@@ -436,7 +453,7 @@
                 <div class="toolbar-row">
                     <button class="btn-sync-export" onclick="exportarJSON()">📲 Compartir Respaldo</button>
                     <label class="btn-sync-import">
-                        📂 Cargar Archivo (PC)
+                        📂 Cargar Archivo
                         <input type="file" id="importJsonInput" accept=".json" onchange="importarJSON(event)" style="display:none;">
                     </label>
                 </div>
@@ -487,7 +504,18 @@
 
                     <div class="form-group">
                         <label for="storeName">Restaurante / Punto de Venta (PDV)</label>
-                        <input type="text" id="storeName" placeholder="Ej. El Corral Calle 100" required>
+                        <input type="text" id="storeName" placeholder="Ej. El Corral Calle 100, Bogotá" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="countryName">País</label>
+                        <select id="countryName" required>
+                            <option value="Colombia" selected>Colombia</option>
+                            <option value="Panamá">Panamá</option>
+                            <option value="Ecuador">Ecuador</option>
+                            <option value="Chile">Chile</option>
+                            <option value="Otro">Otro país</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -792,9 +820,7 @@
             document.getElementById('lightboxModal').style.display = 'none';
         }
 
-        // =============================================================
-        // MOTOR DE ANÁLISIS AUTOMÁTICO (CON DETECCIÓN DE NEGACIONES)
-        // =============================================================
+        // MOTOR DE ANÁLISIS AUTOMÁTICO
         function calcularScoreIA(texto) {
             const t = texto.replace(/\*\*/g, '').replace(/<\/?u>/g, '').toLowerCase();
 
@@ -869,6 +895,7 @@
 
             const editId = document.getElementById('editingAuditId').value;
             const store = document.getElementById('storeName').value.trim();
+            const country = document.getElementById('countryName').value;
             const date = document.getElementById('auditDate').value;
             const comments = document.getElementById('comments').value.trim();
             const chkManual = document.getElementById('chkManualScore').checked;
@@ -887,6 +914,7 @@
                 const idx = audits.findIndex(a => a.id === editId);
                 if (idx !== -1) {
                     audits[idx].store = store;
+                    audits[idx].country = country;
                     audits[idx].date = date;
                     audits[idx].comments = comments;
                     audits[idx].score = finalScore;
@@ -899,6 +927,7 @@
                     id: 'visita_' + Date.now(),
                     auditor: currentAuditor,
                     store: store,
+                    country: country,
                     date: date,
                     comments: comments,
                     score: finalScore,
@@ -922,6 +951,7 @@
         function resetForm() {
             document.getElementById('auditForm').reset();
             document.getElementById('editingAuditId').value = '';
+            document.getElementById('countryName').value = 'Colombia';
             document.getElementById('editingNotice').style.display = 'none';
             document.getElementById('formTitle').innerText = 'Nueva Visita a Punto de Venta';
             document.getElementById('btnSubmitForm').innerText = 'Guardar Registro de Visita';
@@ -942,6 +972,7 @@
 
             document.getElementById('editingAuditId').value = audit.id;
             document.getElementById('storeName').value = audit.store;
+            document.getElementById('countryName').value = audit.country || 'Colombia';
             document.getElementById('auditDate').value = audit.date;
             document.getElementById('comments').value = audit.comments;
             
@@ -990,6 +1021,9 @@
                 const canEdit = currentAuditor && (currentAuditor === audit.auditor);
                 const scoreHTML = getScoreBadge(audit.score);
                 const commentsHTML = formatCommentsVertical(audit.comments);
+                const pais = audit.country || 'Colombia';
+                const mapQuery = encodeURIComponent(`${audit.store}, ${pais}`);
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
 
                 let photosHTML = '';
                 if (audit.photos && audit.photos.length > 0) {
@@ -1023,7 +1057,8 @@
                             ${scoreHTML}
                         </div>
                         <div class="audit-info">
-                            📅 Fecha: <b>${audit.date}</b> | 👤 Responsable: <b>${audit.auditor || 'Anónimo'}</b>
+                            📅 Fecha: <b>${audit.date}</b> | 👤 Responsable: <b>${audit.auditor || 'Anónimo'}</b><br>
+                            <a href="${mapUrl}" target="_blank" class="map-link-btn">🗺️ Ver ubicación en Maps (${pais})</a>
                         </div>
                         <div class="audit-comment">
                             ${commentsHTML}
@@ -1034,15 +1069,40 @@
             }).join('');
         }
 
-        // EXPORTAR / IMPORTAR / BORRAR
-        function exportarJSON() {
-            const data = localStorage.getItem(STORAGE_KEY) || '[]';
-            const blob = new Blob([data], { type: 'application/json' });
+        // EXPORTACIÓN MÓVIL Y DESKOP
+        async function exportarJSON() {
+            const dataStr = localStorage.getItem(STORAGE_KEY) || '[]';
+            const fileName = `respaldo_visitas_corral_${new Date().toISOString().slice(0, 10)}.json`;
+            
+            const blob = new Blob([dataStr], { type: 'application/json' });
+
+            // Verificar si el dispositivo admite compartir archivos nativamente (Celulares Android / iOS)
+            if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'application/json' })] })) {
+                try {
+                    const file = new File([blob], fileName, { type: 'application/json' });
+                    await navigator.share({
+                        title: 'Respaldo Visitas El Corral',
+                        text: 'Adjunto el archivo JSON con los registros de visitas del PDV.',
+                        files: [file]
+                    });
+                    return;
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.warn("Error compartiendo nativamente, probando descarga directa:", err);
+                    } else {
+                        return; // El usuario canceló la acción de compartir
+                    }
+                }
+            }
+
+            // Descarga por enlace tradicional (PC o navegadores móviles sin WebShare API)
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `respaldo_visitas_corral_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = fileName;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
@@ -1054,7 +1114,7 @@
             reader.onload = function(evt) {
                 try {
                     const importedData = JSON.parse(evt.target.result);
-                    if (!Array.isArray(importedData)) throw new Error("El archivo no tiene formato válido.");
+                    if (!Array.isArray(importedData)) throw new Error("El archivo no tiene un formato de lista válido.");
 
                     const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
                     const combined = [...importedData, ...existing];
@@ -1068,7 +1128,7 @@
                     alert("¡Datos importados con éxito!");
                     loadAuditsReviewer();
                 } catch (err) {
-                    alert("Error al importar archivo: " + err.message);
+                    alert("Error al importar el archivo: " + err.message);
                 }
             };
             reader.readAsText(file);
