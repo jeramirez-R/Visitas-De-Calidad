@@ -47,14 +47,14 @@
         .brand-banner {
             background: var(--primary);
             color: white;
-            padding: 16px;
+            padding: 18px 16px;
             text-align: center;
             border-bottom: 4px solid var(--accent);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .brand-banner h1 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 800;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -66,14 +66,14 @@
 
         .app-header {
             background: var(--card);
-            padding: 10px 16px;
+            padding: 12px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
         }
 
-        .user-info { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .user-info { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
         .user-info span { color: var(--primary); font-weight: 700; }
 
         .btn-logout {
@@ -82,7 +82,7 @@
             border: 1px solid #fca5a5;
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             display: none;
@@ -92,24 +92,24 @@
             display: flex; 
             background: #e7e5e4; 
             padding: 4px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .role-btn {
-            flex: 1; padding: 12px; border: none; background: transparent;
-            font-weight: 700; font-size: 0.88rem; color: #57534e; cursor: pointer; border-radius: 6px;
+            flex: 1; padding: 14px; border: none; background: transparent;
+            font-weight: 700; font-size: 0.95rem; color: #57534e; cursor: pointer; border-radius: 6px;
             transition: all 0.2s ease;
         }
 
         .role-btn.active { 
             background: var(--primary); 
             color: white; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
         }
 
         .container { 
             width: 100%; 
-            max-width: 520px; 
+            max-width: 680px; 
             margin: 15px auto; 
             padding: 0 16px;
             flex: 1;
@@ -125,7 +125,7 @@
         .auth-card p { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 20px; }
 
         .form-group { margin-bottom: 16px; }
-        label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.85rem; color: var(--text); }
+        label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.9rem; color: var(--text); }
 
         input, select, textarea {
             width: 100%; padding: 12px; border: 1.5px solid var(--border);
@@ -137,9 +137,8 @@
             border-color: var(--primary);
         }
 
-        textarea { resize: vertical; min-height: 95px; }
+        textarea { resize: vertical; min-height: 100px; }
 
-        /* BARRA DE FORMATO DE TEXTO */
         .text-format-toolbar {
             display: flex;
             gap: 6px;
@@ -150,7 +149,7 @@
             background: #f5f5f4;
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 4px 10px;
+            padding: 5px 12px;
             font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
@@ -178,13 +177,12 @@
 
         .photo-btn {
             display: flex; align-items: center; justify-content: center;
-            padding: 12px; background: #fafaf9; border: 2px dashed var(--border);
+            padding: 14px; background: #fafaf9; border: 2px dashed var(--border);
             border-radius: 8px; font-weight: 700; color: var(--primary); cursor: pointer;
         }
 
-        /* GALERÍA DE FOTOS */
         .photo-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .photo-item { position: relative; width: 100%; height: 80px; }
+        .photo-item { position: relative; width: 100%; height: 90px; }
         .photo-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
         .btn-remove-photo {
             position: absolute; top: -6px; right: -6px; background: #ef4444; color: white;
@@ -193,8 +191,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* BARRAS DE HERRAMIENTAS Y SINCRONIZACIÓN */
-        .toolbar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .toolbar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
         .toolbar-row { display: flex; gap: 8px; width: 100%; }
 
         .btn-sync-export { flex: 1; background: var(--info); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-align: center; }
@@ -202,26 +199,38 @@
 
         .btn-clear { background: #ef4444; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: none; width: 100%; }
 
+        /* TARJETA DE REPORTE AMPLIADA */
         .audit-item {
-            background: var(--card); border-radius: 10px; padding: 16px; margin-bottom: 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); border-left: 6px solid var(--border);
+            background: var(--card); 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07); 
+            border: 1px solid var(--border); 
+            border-left: 8px solid var(--border);
             position: relative;
         }
         
-        .audit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-right: 5px; }
-        .audit-header strong { font-size: 1rem; color: var(--text); }
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 800; color: white; }
+        .audit-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .audit-header strong { font-size: 1.2rem; color: var(--text); font-weight: 800; }
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 0.88rem; font-weight: 800; color: white; display: inline-block; }
 
-        .audit-info { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 4px; }
+        .audit-info { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 500; }
         
-        /* ESTILO VERTICAL PARA LOS COMENTARIOS */
         .audit-comment { 
-            font-size: 0.88rem; 
-            background: #fafaf9; 
-            padding: 12px; 
-            border-radius: 6px; 
-            margin-top: 8px; 
-            border: 1px solid #f5f5f4; 
+            font-size: 0.95rem; 
+            background: #fcfbf9; 
+            padding: 14px; 
+            border-radius: 8px; 
+            margin-top: 10px; 
+            border: 1px solid #f0eee9; 
             color: #292524; 
         }
 
@@ -231,31 +240,83 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .audit-comment-list li {
             position: relative;
-            padding-left: 20px;
-            line-height: 1.4;
+            padding-left: 22px;
+            line-height: 1.5;
         }
 
         .audit-comment-list li::before {
             content: "•";
             position: absolute;
-            left: 5px;
-            top: 0;
+            left: 6px;
+            top: -1px;
             color: var(--primary);
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
         }
 
-        .audit-photos { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
-        .audit-photos img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
-        
-        .audit-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); justify-content: flex-end; }
-        .btn-edit-item { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
-        .btn-delete-item { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+        .audit-photos-container {
+            margin-top: 14px;
+        }
+
+        .audit-photos-title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .audit-photos { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 12px; 
+        }
+
+        .audit-photo-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #000;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .audit-photo-wrapper:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+        }
+
+        .audit-photos img { 
+            width: 100%; 
+            height: 160px;
+            object-fit: cover; 
+            display: block;
+        }
+
+        .audit-photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 6px;
+            text-align: center;
+        }
+
+        .audit-actions { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); justify-content: flex-end; }
+        .btn-edit-item { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+        .btn-delete-item { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
         .editing-banner { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
 
@@ -282,10 +343,9 @@
             cursor: pointer;
         }
 
-        /* MODAL DE RECORTE DE IMAGEN */
         .modal-crop {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85); z-index: 9999; flex-direction: column; justify-content: space-between; padding: 15px;
+            background: rgba(0, 0, 0, 0.88); z-index: 9999; flex-direction: column; justify-content: space-between; padding: 15px;
         }
         .crop-container { width: 100%; height: 70vh; background: #000; border-radius: 8px; overflow: hidden; }
         .crop-toolbar { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
@@ -294,13 +354,54 @@
         .btn-crop-cancel { flex: 1; background: #4b5563; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-crop-save { flex: 1; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
-        /* FOOTER AL FINAL DE LA PÁGINA */
+        .modal-lightbox {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.92); 
+            z-index: 10000; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+        }
+        .modal-lightbox img {
+            max-width: 95%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+        }
+        .btn-close-lightbox {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-close-lightbox:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
         .app-footer {
             margin-top: auto;
             text-align: center;
             padding: 16px;
-            font-size: 0.9rem;
-            font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 800;
             color: var(--primary);
             border-top: 1px solid var(--border);
             background: var(--card);
@@ -313,7 +414,6 @@
 </head>
 <body>
 
-    <!-- BRANDING EL CORRAL -->
     <div class="brand-banner">
         <h1>El Corral <span>| Visitas PDV</span></h1>
     </div>
@@ -398,20 +498,19 @@
                     <div class="form-group">
                         <label for="comments">Observaciones / Hallazgos</label>
                         
-                        <!-- BARRA DE HERRAMIENTAS DE FORMATO -->
                         <div class="text-format-toolbar">
                             <button type="button" class="btn-format" onclick="applyTextFormat('bold')" title="Negrilla"><b>B</b> Negrilla</button>
                             <button type="button" class="btn-format" onclick="applyTextFormat('underline')" title="Subrayado"><u>U</u> Subrayar</button>
                         </div>
 
-                        <textarea id="comments" placeholder="Escribe los hallazgos detallados de la visita. Selecciona texto y presiona los botones arriba para formatear..." required></textarea>
+                        <textarea id="comments" placeholder="Escribe los hallazgos detallados de la visita..." required></textarea>
                     </div>
 
-                    <!-- CONTROL PARA DESACTIVAR NOTA DE IA Y ASIGNARLA MANUALMENTE -->
+                    <!-- CONTROL PARA ASIGNAR CALIFICACIÓN MANUALMENTE -->
                     <div class="score-toggle-box">
                         <label class="checkbox-label">
                             <input type="checkbox" id="chkManualScore" onchange="toggleManualScoreInput()">
-                            <b>Desactivar calificación automática de IA (Ingresar manualmente)</b>
+                            <b>Ingresar calificación de forma manual</b>
                         </label>
                         <div id="manualScoreGroup" class="form-group" style="display: none; margin-top: 10px; margin-bottom: 0;">
                             <label for="manualScoreInput">Calificación Manual Auditor (0 - 10)</label>
@@ -433,12 +532,11 @@
 
     </div>
 
-    <!-- PIE DE PÁGINA SOLICITADO -->
     <footer class="app-footer">
         Comprometidos con la excelencia
     </footer>
 
-    <!-- MODAL DE RECORTE Y EDICIÓN DE FOTOS -->
+    <!-- MODAL RECORTE -->
     <div id="cropModal" class="modal-crop">
         <div class="crop-container">
             <img id="imageToCrop" src="" style="max-width: 100%; display: block;">
@@ -451,6 +549,12 @@
             <button type="button" class="btn-crop-cancel" onclick="closeCropModal()">Cancelar</button>
             <button type="button" class="btn-crop-save" onclick="applyCropAndSave()">Aceptar y Guardar</button>
         </div>
+    </div>
+
+    <!-- MODAL LIGHTBOX -->
+    <div id="lightboxModal" class="modal-lightbox" onclick="closeLightbox()">
+        <button class="btn-close-lightbox" onclick="closeLightbox()">✕</button>
+        <img id="lightboxImage" src="" onclick="event.stopPropagation()">
     </div>
 
     <script>
@@ -551,7 +655,6 @@
             group.style.display = chk.checked ? 'block' : 'none';
         }
 
-        // APLICAR FORMATO DE NE GRILLA Y SUBRAYADO EN EL TEXTAREA
         function applyTextFormat(type) {
             const textarea = document.getElementById('comments');
             const start = textarea.selectionStart;
@@ -576,15 +679,12 @@
             textarea.setSelectionRange(start, start + formattedText.length);
         }
 
-        // FUNCIÓN PARA FORMATEAR EL TEXTO VERTICALMENTE EN CADA PUNTO Y APARTE + PARSEO DE ETIQUETAS
         function formatCommentsVertical(text) {
             if (!text) return '';
             
-            // Separa el texto por saltos de línea o por punto seguido
             const lines = text.split(/(?:\r\n|\r|\n|\.\s+)/).map(l => l.trim()).filter(l => l.length > 0);
             
             const parseTags = (str) => {
-                // Convierte **texto** a <b>texto</b>
                 let parsed = str.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 return parsed;
             };
@@ -601,10 +701,7 @@
             return `<ul class="audit-comment-list">${items}</ul>`;
         }
 
-        // ==========================================
-        // MANEJO Y RECORTE DE IMÁGENES (CROPPER.JS)
-        // ==========================================
-
+        // CROPPER & FOTOS
         document.getElementById('photoInput').addEventListener('change', function(e) {
             const files = e.target.files;
             if (files && files.length > 0) {
@@ -686,28 +783,72 @@
             renderPhotoPreview();
         }
 
-        // ALGORITMO MEJORADO DE EVALUACIÓN DE TEXTO DE IA
+        function openImageZoom(src) {
+            document.getElementById('lightboxImage').src = src;
+            document.getElementById('lightboxModal').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').style.display = 'none';
+        }
+
+        // =============================================================
+        // MOTOR DE ANÁLISIS AUTOMÁTICO (CON DETECCIÓN DE NEGACIONES)
+        // =============================================================
         function calcularScoreIA(texto) {
-            // Limpiar etiquetas de formato antes de procesar
             const t = texto.replace(/\*\*/g, '').replace(/<\/?u>/g, '').toLowerCase();
 
+            // 1. Palabras graves directas
             const graves = [
                 "sucio", "roto", "dañado", "vencido", "moho", "plaga", "riesgo", "contaminado", 
-                "grave", "pésimo", "mal estado", "sin uniforme", "fuga", "suciedad", "malo", 
-                "feo", "daño", "falla", "inconforme", "desastre", "insalubre", "graso", "manchado"
+                "grave", "pésimo", "mal estado", "fuga", "suciedad", "malo", "feo", "daño", 
+                "falla", "inconforme", "desastre", "insalubre", "graso", "manchado"
             ];
+
+            // 2. Palabras moderadas directas
             const moderadas = [
                 "falta", "incompleto", "desorden", "demora", "regular", "limpiar", "revisar", 
-                "atención", "desgaste", "observación", "retraso", "pendiente", "desordenado", "no hay", "sin"
+                "atención", "desgaste", "observación", "retraso", "pendiente", "desordenado"
             ];
+
+            // 3. Palabras positivas
             const positivas = [
                 "excelente", "limpio", "ordenado", "impecable", "cumple", "perfecto", "buen", 
                 "destacado", "rápido", "correcto", "organizado", "buena", "bien"
             ];
 
+            // 4. Elementos operativos/procesos donde un "NO" representa una falla grave o moderada
+            const aspectosGraveSinNo = [
+                "uniforme", "tapabocas", "cofia", "guantes", "lavado", "desinfección", "limpieza", 
+                "registro", "temperatura", "carnet", "fumigación", "mantenimiento"
+            ];
+
+            const aspectosModeradoSinNo = [
+                "hay", "esta", "está", "tienen", "posee", "cumple", "existe", "funciona", 
+                "sirve", "jabón", "jabon", "toallas", "agua", "orden", "rotulación"
+            ];
+
             let penalty = 0;
             let bonus = 0;
 
+            // Análisis de construcciones negativas con "NO", "SIN" o "NO HAY"
+            // Evalúa combinaciones como "no usan uniforme", "sin desinfección", "no hay jabon", "no funciona"
+            const regexNegacion = /(?:no|sin)\s+(?:\w+\s+){0,3}(\w+)/g;
+            let match;
+
+            while ((match = regexNegacion.exec(t)) !== null) {
+                const palabraAsociada = match[1];
+
+                if (aspectosGraveSinNo.includes(palabraAsociada)) {
+                    penalty += 3.0; // Falla grave de proceso por omisión
+                } else if (aspectosModeradoSinNo.includes(palabraAsociada)) {
+                    penalty += 1.8; // Falla moderada de proceso por omisión
+                } else {
+                    penalty += 1.2; // Penalización base por negación operativa general
+                }
+            }
+
+            // Análisis directo de palabras clave
             graves.forEach(word => { if (t.includes(word)) penalty += 3.0; });
             moderadas.forEach(word => { if (t.includes(word)) penalty += 1.5; });
             positivas.forEach(word => { if (t.includes(word)) bonus += 1.0; });
@@ -744,10 +885,7 @@
             return { score, nivel, color };
         }
 
-        // ==========================================
         // GUARDADO DE LA VISITA
-        // ==========================================
-
         document.getElementById('auditForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -764,14 +902,11 @@
                 const valInput = parseFloat(document.getElementById('manualScoreInput').value);
                 const scoreVal = isNaN(valInput) ? 10 : Math.min(10, Math.max(0, valInput));
                 evalResult = formatScoreObject(scoreVal);
-                evalResult.isManual = true;
             } else {
                 evalResult = calcularScoreIA(commentsText);
-                evalResult.isManual = false;
             }
 
             const editingId = document.getElementById('editingAuditId').value;
-
             let audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
             if (editingId) {
@@ -784,7 +919,6 @@
                             score: evalResult.score,
                             scoreLevel: evalResult.nivel,
                             scoreColor: evalResult.color,
-                            isManualScore: evalResult.isManual,
                             comments: commentsText,
                             photos: [...currentPhotos],
                             lastEditedBy: currentAuditor,
@@ -802,7 +936,6 @@
                     score: evalResult.score,
                     scoreLevel: evalResult.nivel,
                     scoreColor: evalResult.color,
-                    isManualScore: evalResult.isManual,
                     comments: commentsText,
                     photos: [...currentPhotos]
                 };
@@ -821,7 +954,7 @@
                 loadAuditsReviewer();
             } catch (error) {
                 if (error.name === 'QuotaExceededError' || error.code === 22) {
-                    alert("⚠️ La memoria local está llena. Por favor descarga un respaldo JSON, cárgalo en la PC y elimina algunas visitas antiguas para continuar agregando nuevos registros.");
+                    alert("⚠️ La memoria local está llena. Por favor descarga un respaldo JSON, cárgalo en la PC y elimina algunas visitas antiguas.");
                 } else {
                     alert("⚠️ Ocurrió un error al guardar la visita.");
                 }
@@ -841,13 +974,8 @@
             document.getElementById('auditDate').value = audit.date;
             document.getElementById('comments').value = audit.comments;
             
-            if (audit.isManualScore) {
-                document.getElementById('chkManualScore').checked = true;
-                document.getElementById('manualScoreInput').value = audit.score;
-            } else {
-                document.getElementById('chkManualScore').checked = false;
-                document.getElementById('manualScoreInput').value = '';
-            }
+            document.getElementById('chkManualScore').checked = false;
+            document.getElementById('manualScoreInput').value = '';
             toggleManualScoreInput();
 
             currentPhotos = audit.photos ? [...audit.photos] : [];
@@ -885,6 +1013,7 @@
             }
         }
 
+        // CARGA Y RENDERIZADO DE REPORTES
         function loadAuditsReviewer() {
             const container = document.getElementById('auditsList');
             const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -896,18 +1025,31 @@
             }
 
             if (audits.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:30px; color:#a8a29e;">No hay registros de visitas en este momento.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding:40px; color:#a8a29e; font-size:1.05rem;">No hay registros de visitas en este momento.</div>`;
                 return;
             }
 
             container.innerHTML = audits.map(audit => {
-                const photosHTML = audit.photos && audit.photos.length > 0 
-                    ? `<div class="audit-photos">${audit.photos.map(p => `<img src="${p}" onclick="openImage('${p}')">`).join('')}</div>` 
-                    : '';
+                let photosHTML = '';
+                if (audit.photos && audit.photos.length > 0) {
+                    const photoItems = audit.photos.map((p, idx) => `
+                        <div class="audit-photo-wrapper" onclick="openImageZoom('${p}')" title="Clic para ampliar">
+                            <img src="${p}" alt="Evidencia ${idx + 1}">
+                            <div class="audit-photo-overlay">🔍 Ampliar</div>
+                        </div>
+                    `).join('');
 
+                    photosHTML = `
+                        <div class="audit-photos-container">
+                            <div class="audit-photos-title">📷 Evidencia Fotográfica (${audit.photos.length}):</div>
+                            <div class="audit-photos">${photoItems}</div>
+                        </div>
+                    `;
+                }
+
+                // ETIQUETA SIMPLIFICADA (SIN IA NI MANUAL)
                 const scoreDisplay = audit.score !== undefined ? `${audit.score} / 10 (${audit.scoreLevel})` : 'Sin Calificar';
                 const colorBadge = audit.scoreColor || 'var(--primary)';
-                const badgeTag = audit.isManualScore ? '✏️ Manual:' : '🤖 IA:';
                 
                 const formattedComments = formatCommentsVertical(audit.comments);
 
@@ -922,7 +1064,7 @@
                     <div class="audit-item" style="border-left-color: ${colorBadge};">
                         <div class="audit-header">
                             <strong>${audit.store}</strong>
-                            <span class="badge" style="background-color: ${colorBadge};">${badgeTag} ${scoreDisplay}</span>
+                            <span class="badge" style="background-color: ${colorBadge};">${scoreDisplay}</span>
                         </div>
                         <div class="audit-info">👤 Responsable: <b>${audit.auditor}</b> | 📅 ${audit.date}</div>
                         <div class="audit-comment">${formattedComments}</div>
@@ -931,11 +1073,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function openImage(src) {
-            const w = window.open("");
-            w.document.write(`<img src="${src}" style="max-width:100%; height:auto;">`);
         }
 
         function exportarJSON() {
