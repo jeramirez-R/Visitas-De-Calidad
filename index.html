@@ -864,7 +864,7 @@
                     if (graves.includes(limpia)) {
                         score -= esNegada ? 0.2 : 2.0;
                     } else if (moderadas.includes(limpia)) {
-                        score -= esNegada ? 0.1 : 0.8;
+                        score -= esNegada ? 0.8 : 0.8;
                     } else if (positivas.includes(limpia)) {
                         if (esNegada) score -= 1.5;
                     }
@@ -1018,7 +1018,8 @@
             }
 
             container.innerHTML = audits.map(audit => {
-                const canEdit = currentAuditor && (currentAuditor === audit.auditor);
+                // CORRECCIÓN DE EDICIÓN: Si hay una sesión iniciada como auditor (currentAuditor !== null), permite editar y eliminar.
+                const canEdit = Boolean(currentAuditor);
                 const scoreHTML = getScoreBadge(audit.score);
                 const commentsHTML = formatCommentsVertical(audit.comments);
                 const pais = audit.country || 'Colombia';
@@ -1069,14 +1070,13 @@
             }).join('');
         }
 
-        // EXPORTACIÓN MÓVIL Y DESKOP
+        // EXPORTACIÓN MÓVIL Y DESKTOP
         async function exportarJSON() {
             const dataStr = localStorage.getItem(STORAGE_KEY) || '[]';
             const fileName = `respaldo_visitas_corral_${new Date().toISOString().slice(0, 10)}.json`;
             
             const blob = new Blob([dataStr], { type: 'application/json' });
 
-            // Verificar si el dispositivo admite compartir archivos nativamente (Celulares Android / iOS)
             if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'application/json' })] })) {
                 try {
                     const file = new File([blob], fileName, { type: 'application/json' });
@@ -1090,12 +1090,11 @@
                     if (err.name !== 'AbortError') {
                         console.warn("Error compartiendo nativamente, probando descarga directa:", err);
                     } else {
-                        return; // El usuario canceló la acción de compartir
+                        return;
                     }
                 }
             }
 
-            // Descarga por enlace tradicional (PC o navegadores móviles sin WebShare API)
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
