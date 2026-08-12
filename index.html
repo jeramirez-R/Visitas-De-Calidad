@@ -597,25 +597,39 @@
         let currentPhotos = [];
         let cropper = null;
 
-        document.addEventListener("DOMContentLoaded", function() {
+        // VERIFICACIÓN PERMANENTE DE SESIÓN
+        function checkSession() {
             const savedSession = localStorage.getItem(SESSION_KEY);
             if (savedSession) {
                 currentAuditor = savedSession;
                 document.getElementById('currentUserName').innerText = `Responsable: ${currentAuditor}`;
                 document.getElementById('btnLogout').style.display = 'block';
                 document.getElementById('btnClearData').style.display = 'block';
+                return true;
+            } else {
+                currentAuditor = null;
+                document.getElementById('currentUserName').innerText = 'Consulta Pública';
+                document.getElementById('btnLogout').style.display = 'none';
+                document.getElementById('btnClearData').style.display = 'none';
+                return false;
             }
+        }
 
+        document.addEventListener("DOMContentLoaded", function() {
+            checkSession();
             loadAuditsReviewer();
         });
 
         window.addEventListener('storage', function(e) {
-            if (e.key === STORAGE_KEY) {
+            if (e.key === STORAGE_KEY || e.key === SESSION_KEY) {
+                checkSession();
                 loadAuditsReviewer();
             }
         });
 
         function switchRole(role) {
+            checkSession();
+            
             document.getElementById('tabRevisor').classList.remove('active');
             document.getElementById('tabAuditor').classList.remove('active');
             
@@ -652,13 +666,12 @@
                 currentAuditor = email;
                 localStorage.setItem(SESSION_KEY, currentAuditor);
 
-                document.getElementById('currentUserName').innerText = `Responsable: ${currentAuditor}`;
-                document.getElementById('btnLogout').style.display = 'block';
-                document.getElementById('btnClearData').style.display = 'block';
+                checkSession();
 
                 document.getElementById('authSection').classList.remove('active');
                 document.getElementById('auditorFormView').classList.add('active');
                 document.getElementById('auditDate').valueAsDate = new Date();
+                
                 loadAuditsReviewer();
             } else {
                 errorDiv.innerText = "Acceso denegado: Correo o contraseña incorrectos.";
@@ -671,9 +684,7 @@
             localStorage.removeItem(SESSION_KEY);
             cancelEditing();
             document.getElementById('loginForm').reset();
-            document.getElementById('currentUserName').innerText = 'Consulta Pública';
-            document.getElementById('btnLogout').style.display = 'none';
-            document.getElementById('btnClearData').style.display = 'none';
+            checkSession();
             switchRole('revisor');
         }
 
@@ -911,7 +922,7 @@
             const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
             if (editId) {
-                const idx = audits.findIndex(a => a.id === editId);
+                const idx = audits.findIndex(a => String(a.id) === String(editId));
                 if (idx !== -1) {
                     audits[idx].store = store;
                     audits[idx].country = country;
@@ -925,7 +936,7 @@
             } else {
                 const newAudit = {
                     id: 'visita_' + Date.now(),
-                    auditor: currentAuditor,
+                    auditor: currentAuditor || 'Anónimo',
                     store: store,
                     country: country,
                     date: date,
@@ -967,7 +978,7 @@
 
         function editAudit(id) {
             const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const audit = audits.find(a => a.id === id);
+            const audit = audits.find(a => String(a.id) === String(id));
             if (!audit) return;
 
             document.getElementById('editingAuditId').value = audit.id;
@@ -999,7 +1010,7 @@
         function deleteAudit(id) {
             if (!confirm('¿Estás seguro de eliminar este registro de visita?')) return;
             let audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            audits = audits.filter(a => a.id !== id);
+            audits = audits.filter(a => String(a.id) !== String(id));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(audits));
             loadAuditsReviewer();
         }
@@ -1007,6 +1018,9 @@
         function loadAuditsReviewer() {
             const container = document.getElementById('auditsList');
             const audits = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            
+            // Verificación explícita de la sesión actual
+            const isLoggedIn = Boolean(checkSession());
 
             if (audits.length === 0) {
                 container.innerHTML = `
@@ -1018,8 +1032,6 @@
             }
 
             container.innerHTML = audits.map(audit => {
-                // CORRECCIÓN DE EDICIÓN: Si hay una sesión iniciada como auditor (currentAuditor !== null), permite editar y eliminar.
-                const canEdit = Boolean(currentAuditor);
                 const scoreHTML = getScoreBadge(audit.score);
                 const commentsHTML = formatCommentsVertical(audit.comments);
                 const pais = audit.country || 'Colombia';
@@ -1042,8 +1054,9 @@
                         </div>`;
                 }
 
+                // SI EL USUARIO HA INICIADO SESIÓN COMO AUDITOR, PUEDE EDITAR Y ELIMINAR CUALQUIER REGISTRO
                 let actionsHTML = '';
-                if (canEdit) {
+                if (isLoggedIn) {
                     actionsHTML = `
                         <div class="audit-actions">
                             <button class="btn-edit-item" onclick="editAudit('${audit.id}')">✏️ Editar</button>
